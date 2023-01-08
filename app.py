@@ -2,14 +2,14 @@ from flask import Flask, render_template, request
 from py2neo import Graph
 import json
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='')
 
 # graph = Graph('http://localhost:7474',username='neo4j',password='123456')  老版本的py2neo
 graph = Graph("http://localhost:7474", auth=("neo4j", "123456"))
 
 
 @app.route('/')
-def index():  # put application's code here
+def index():
     return render_template('index.html')
 
 
@@ -32,8 +32,7 @@ def knowledge2():
     return render_template('knowledge2.html', ctx=ctx)
 
 
-
-@app.route('/friends_rel_kg/', methods=['GET', 'POST'])
+@app.route('/friends_rel_kg.html', methods=['GET', 'POST'])
 def friends_rel_kg():
     ctx = {}
     if request.method == 'POST':
@@ -145,7 +144,6 @@ def query(name, num):
     datas_json = json.dumps(datas, ensure_ascii=False)
     # print("query_data:", data)
     return datas_json
-
 
 
 def search_one(value, num):

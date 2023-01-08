@@ -3,8 +3,8 @@
     <head>
         <meta charset="UTF-8">
         <!--移植内容-->
-        <script src="../static/js/jquery.min.js"></script>
-        <script src="../static/js/echarts.js"></script>
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/echarts.js"></script>
         <link rel="stylesheet" href="../static/css/bootstrap.min.css">
 
         <title>诗人关系图谱</title>
@@ -37,7 +37,7 @@
 <!--            </div>-->
 <!--        </div>-->
     <div style="width: 1600px;height: 50px;border-top: 2px solid black;border-left: 2px solid black;border-right: 2px solid black">
-        <form action="/friends_rel_kg" method="post">
+        <form action="/friends_rel_kg.html" method="post">
             <input type="text" name="node" style="width: 250px;height: 20px; margin-top: 10px;margin-left: 20px;" placeholder="输入要查询的目标">
             <input type="text" name="num" placeholder="查询结果数量">
             <input type="submit" value="查询">
