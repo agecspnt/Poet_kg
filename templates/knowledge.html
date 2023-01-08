@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="height: 100%">
+<head>
+    <meta charset="UTF-8">
+    <script src="../static/js/jquery.min.js"></script>
+    <script src="../static/js/echarts.js"></script>
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+        <!--<script src="../static/js/knowledge.js"></script>-->
+    <title>诗人关系图谱</title>
+</head>
+
+
+
+<body style="height: 100%; margin: 0">
+<!--<div id="container" style="height: 100%"></div>-->
+<!--    <script src="../static/js/knowledge.js"></script>-->
+<div id="main">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="input-group">
+                <input type="text" id="search" class="form-control input-lg"
+                       placeholder="查询">
+                <span class="input-group-addon btn btn-mint" id="c_search">搜索</span>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="input-group">
+                <input type="text" id="search_num" class="input-lg"
+                       placeholder="查询结果数量">
+            </div>
+        </div>
+        <button type="button" class="btn btn-sm" onclick="saveAsImage()">导出为图片</button>
+    </div>
+
+    <div class="row" style="height: 40px;"></div>
+
+    <div class="row">
+        <div class="col-lg-8" style="height: 700px; width: 100%" id="guanxi">
+            这里放生成的图谱
+        </div>
+        <div class="col-lg-2"></div>
+    </div>
+
+</div>
+</body>
+
+
+
+
+
+
+
+
+<script>
+    $("#c_search").click(function () {
+        var name = $("#search").val();
+        var num = $("#search_num").val();
+        alert(name);
+        search(name, num);
+    })
+
+    var myChart = echarts.init(document.getElementById("guanxi"));
+    $(document).keypress(function (e) {
+        // 回车键事件
+        if (e.which == 13) {
+            var name = $("#search").val();
+            var num = $("#search_num").val();
+            alert(name);
+            search(name, num);
+        }
+    });
+    // $("#c_search").click(function () {
+    //     var name = $("#search").val();
+    //     var num = $("#search_num").val();
+    //     alert(name);
+    //     search(name, num);
+    // })
+    function search(name, num) {
+        $.getJSON('/search_name', {
+                name: name,
+                num: num,
+            }, function (graph) {
+                myChart.hideLoading();
+                graph.nodes.forEach(function (node) {
+                    node.symbolSize = 30;
+                });
+                option = {
+                    title: {
+                        subtext: 'Default layout',
+                        top: 'bottom',
+                        left: 'right'
+                    },
+                    tooltip: {
+                        show: true,    // 是否显示提示框组件
+                        position: [10, 20],
+                        extraCssText: 'white-space: pre-wrap; word-break: break-all;',
+                        triggerOn: 'click',
+                        confine: true,
+                        formatter: function (params) {
+                            //遍历params.data
+                            var str = "";
+                            for (var i in params.data) {
+                                str += '<span  style=\"display:inline-block;margin-right:5px;border-radius:5px;width:10px;height:10px;background-color:#F56A6A\"></span>' + i + ":" + params.data[i] + "<br>";
+                            }
+                            ;
+                            str = '<marquee direction="up" onMouseOut=start(); onMouseOver=stop(); behavior="alternate" scrolldelay="10" scrollamount="1"  style=\"width:700px; max-height:400px;overflow-y:auto;\">' + str + '</marquee>';
+                            return str;
+                        }
+                    },
+                    legend: [
+                        {
+                            data: graph.categories.map(function (a) {
+                                return a.name;
+                            })
+                        }
+                    ],
+                    series: [
+                        {
+                            name: '古诗词人物关系知识图谱',
+                            type: 'graph',
+                            layout: 'force',
+                            data: graph.nodes,
+                            links: graph.links,
+                            categories: graph.categories,
+                            roam: true,
+                            edgeSymbol: ['circle', 'arrow'],
+                            label: {
+                                show: true,
+                                position: 'inside'
+                            },
+                            force: {
+                                repulsion: 100
+                            },
+                            edgeLabel: {
+                                show: true,
+                                position: 'middle',
+                                formatter: function (params) {
+                                    let str = params.data.type;
+                                    return str;
+                                }
+                            }
+                        }
+                    ]
+                };
+                myChart.setOption(option, true);
+            }
+        );
+    }
+
+    //base64转blob
+    function base64ToBlob(code) {
+        let parts = code.split(';base64,');
+        let contentType = parts[0].split(':')[1];
+        let raw = window.atob(parts[1]);
+        let rawLength = raw.length;
+        let uInt8Array = new Uint8Array(rawLength);
+        for (let i = 0; i < rawLength; ++i) {
+            uInt8Array[i] = raw.charCodeAt(i);
+        }
+        return new Blob([uInt8Array], {type: contentType});
+    }
+
+    function saveAsImage() {
+        let content = myChart.getDataURL();
+
+        let aLink = document.createElement('a');
+        let blob = this.base64ToBlob(content);
+
+        let evt = document.createEvent("HTMLEvents");
+        evt.initEvent("click", true, true);
+        aLink.download = "graph.png";
+        aLink.href = URL.createObjectURL(blob);
+        aLink.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true, view: window}));
+
+        var base64_data = myChart.getDataURL();
+        $.getJSON('/base', {
+                base: base64_data,
+            }
+            , function (json) {
+            });
+    }
+</script>
+
+</html>
