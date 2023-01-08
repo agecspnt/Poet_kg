@@ -13,6 +13,7 @@ def index():
     return render_template('index.html')
 
 
+
 @app.route('/knowledge2.html', methods=['GET', 'POST'])
 def knowledge2():
     ctx = {}
@@ -31,9 +32,9 @@ def knowledge2():
             return render_template('knowledge2.html', search_neo4j_data=search_neo4j_data, ctx=ctx)
     return render_template('knowledge2.html', ctx=ctx)
 
-
-@app.route('/friends_rel_kg.html', methods=['GET', 'POST'])
-def friends_rel_kg():
+# 图谱搜索
+@app.route('/search_kg.html', methods=['GET', 'POST'])
+def search_kg():
     ctx = {}
     if request.method == 'POST':
         # 接收前端传过来的查询值
@@ -44,11 +45,11 @@ def friends_rel_kg():
         # 未查询到该节点
         if search_neo4j_data == 0:
             ctx = {'title': '数据库中暂未添加该实体'}
-            return render_template('friends_rel_kg.html', ctx=ctx)
+            return render_template('search_kg.html', ctx=ctx)
         # 查询到了该节点
         else:
-            return render_template('friends_rel_kg.html', search_neo4j_data=search_neo4j_data, ctx=ctx)
-    return render_template('friends_rel_kg.html', ctx=ctx)
+            return render_template('search_kg.html', search_neo4j_data=search_neo4j_data, ctx=ctx)
+    return render_template('search_kg.html', ctx=ctx)
 
 
 @app.route('/knowledge.html', methods=['GET', 'POST'])
