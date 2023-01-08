@@ -35,6 +35,8 @@ def knowledge2():
 # 图谱搜索
 @app.route('/search_kg.html', methods=['GET', 'POST'])
 def search_kg():
+    # 默认显示的图谱查询
+    default_display = search_one("文天祥", 20)
     ctx = {}
     if request.method == 'POST':
         # 接收前端传过来的查询值
@@ -49,7 +51,8 @@ def search_kg():
         # 查询到了该节点
         else:
             return render_template('search_kg.html', search_neo4j_data=search_neo4j_data, ctx=ctx)
-    return render_template('search_kg.html', ctx=ctx)
+
+    return render_template('search_kg.html', search_neo4j_data=default_display,ctx=ctx)
 
 
 @app.route('/knowledge.html', methods=['GET', 'POST'])
